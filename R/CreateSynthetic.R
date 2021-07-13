@@ -14,11 +14,22 @@
 
 #' Create the synthetic data
 #'
-#'
+#' Creates a synthetic data set from internal data and external models.
+#' 
+#' @param datan internal data only
+#' @param nrep number of replication when creating the synthetic data
+#' @param Y outcome name, e.g. Y='Y'
+#' @param XB all covariate names for both X and B in the target model, e.g. XB=c('X1','X2','X3','X4','B1','B2')
+#' @param Ytype the type of outcome Y, either 'binary' or 'continuous'.
+#' @param parametric choice of "Yes" or "No" for each external model. Specify whether the external model is paramtric or not, e.g. parametric=c('Yes','No')
+#' @param betaHatExt_list a list of parameter estimates of the external models. The order needs to be the same as listed in XB, and variable name is required. See example for details.
+#' @param sigmaHatExt_list a list of sigma^2 for continuous outcome fitted from linear regression. If not available or the outcome type is binary, set sigmaHatExt_list=NULL
 #'
 #' @references Reference: Gu, T., Taylor, J.M.G. and Mukherjee, B. (2021) Regression 
 #' inference for multiple populations by integrating summary-level data using stacked 
 #' imputations <arXiv:http://arxiv.org/abs/2106.06835>. 
+#' 
+#' @export
 Create.Synthetic <- function(datan, nrep, Y='Y', XB=c('X1','X2','X3','X4','B1','B2'), Ytype='binary', parametric=c('Yes','No'), betaHatExt_list, sigmaHatExt_list=NULL){
   n = dim(datan)[1]
   m = n*nrep

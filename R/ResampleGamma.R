@@ -2,6 +2,21 @@
 ###################################################################################
 ########## Function 4: Resampling function to get bootstrap variance for binary Y
 ##################################################################################
+
+#' Resample for bootstrap variance for binary Y
+#' 
+#' Resampling function to get bootstrap variance for binary Y.
+#' 
+#' @param data synthetic data
+#' @param indices indices ??
+#' 
+#' @return numeric vector of regression coefficients
+#' 
+#' @references Reference: Gu, T., Taylor, J.M.G. and Mukherjee, B. (2021) Regression 
+#' inference for multiple populations by integrating summary-level data using stacked 
+#' imputations <arXiv:http://arxiv.org/abs/2106.06835>. 
+#' 
+#' @export
 Resample.gamma.binaryY <- function(data, indices){
   d = data[indices,]
   datan = d
@@ -108,6 +123,21 @@ Resample.gamma.binaryY <- function(data, indices){
 ########################################################################################
 ########## Function 5: Resampling function to get bootstrap variance for continuous Y
 #######################################################################################
+
+#' Resample for bootstrap variance continuous Y
+#' 
+#' Resampling function to get bootstrap variance for continuous Y.
+#' 
+#' @param data synthetic data
+#' @param indices indices ??
+#' 
+#' @return numeric vector of regression coefficients
+#' 
+#' @references Reference: Gu, T., Taylor, J.M.G. and Mukherjee, B. (2021) Regression 
+#' inference for multiple populations by integrating summary-level data using stacked 
+#' imputations <arXiv:http://arxiv.org/abs/2106.06835>. 
+#' 
+#' @export
 
 Resample.gamma.continuousY <- function(data, indices){
   d = data[indices,]
