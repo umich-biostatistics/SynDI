@@ -2,6 +2,7 @@ export(Create.Synthetic)
 export(Initial.estimates)
 export(Resample.gamma.binaryY)
 export(Resample.gamma.continuousY)
+export(expit)
 importFrom("stats", "as.formula", "binomial", "coef", "cov", "dbinom",
                "dnorm", "gaussian", "glm", "lm", "predict", "rbinom",
                "rnorm", "sigma")
