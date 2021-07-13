@@ -83,7 +83,7 @@ Initial.estimates <- function(datan, gamma.I, X=c('X1','X2','X3'), B=c('X4','B1'
     cov.Bi.Bj = 0
   }
   SolveEquation = function(gamma.int){
-    tmp1 = gamma.int+ sum(gamma.I[B] * E.B)
+    tmp1 = gamma.int + sum(gamma.I[B] * E.B)
     RHS = expit(tmp1)*(1 + 1/2*(1-exp(tmp1))/(1+exp(tmp1))^2*(sum(gamma.I[B]^2*Var.B)+2*sum(cov.Bi.Bj)))
     LHS = expit(beta[1])
     return(RHS-LHS)

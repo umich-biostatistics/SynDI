@@ -6,6 +6,11 @@
 \usage{
 expit(x)
 }
+\arguments{
+\item{x}{vector to expit
+
+Expit helper function.}
+}
 \description{
-Expit helper function.
+Expit function
 }

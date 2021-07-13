@@ -109,7 +109,7 @@ Resample.gamma.binaryY <- function(data, indices){
   stack[stack$S == 0, 'wt'] = dbinom(stack[stack$S == 0, 'Y'], 1, prob = expit(data.matrix(stack[stack$S==0, c('Int','X1','X2','X3','X4','B1','B2')])%*%matrix(gamma.I, q, 1)))
   stack[stack$S == 1, 'wt'] = dbinom(stack[stack$S == 1, 'Y'], 1, prob = expit(data.matrix(stack[stack$S==1, c('Int','X1','X2','X3','X4','B1','B2')])%*%matrix(gamma.S1.origin, q, 1)))
   stack[stack$S == 2, 'wt'] = dbinom(stack[stack$S == 2, 'Y'], 1, prob = expit(data.matrix(stack[stack$S==2, c('Int','X1','X2','X3','X4','B1','B2')])%*%matrix(gamma.S2.origin, q, 1)))
-  stack = as.data.frame(stack %>% group_by(.id) %>% mutate(wt = wt / sum(wt)))   ## weights need to be re-scaled to 1 within individuals
+  stack = as.data.frame(stack %>% dplyr::group_by(.id) %>% dplyr::mutate(wt = wt / sum(wt)))   ## weights need to be re-scaled to 1 within individuals
   if(sum(is.na(stack$wt))>0){
     stack[is.na(stack$wt)==TRUE,]$wt = 0
   }
@@ -195,7 +195,7 @@ Resample.gamma.continuousY <- function(data, indices){
   stack[stack$S == 0, 'wt'] = dnorm(stack[stack$S == 0, 'Y'], data.matrix(stack[stack$S==0, c('Int','X1','X2','B1','B2')])%*%matrix(gamma.I, q, 1))
   stack[stack$S == 1, 'wt'] = dnorm(stack[stack$S == 1, 'Y'], data.matrix(stack[stack$S==1, c('Int','X1','X2','B1','B2')])%*%matrix(gamma.S1.origin, q, 1))
   stack[stack$S == 2, 'wt'] = dnorm(stack[stack$S == 2, 'Y'], data.matrix(stack[stack$S==2, c('Int','X1','X2','B1','B2')])%*%matrix(gamma.S2.origin, q, 1))
-  stack = as.data.frame(stack %>% group_by(.id) %>% mutate(wt = wt / sum(wt)))   ## weights need to be re-scaled to 1 within individuals
+  stack = as.data.frame(stack %>% dplyr::group_by(.id) %>% dplyr::mutate(wt = wt / sum(wt)))   ## weights need to be re-scaled to 1 within individuals
   if(sum(is.na(stack$wt))>0){
     stack[is.na(stack$wt)==TRUE,]$wt = 0
   }

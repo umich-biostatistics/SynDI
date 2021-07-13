@@ -4,6 +4,8 @@
 ###################################
 
 #' Expit function
+#' 
+#' @param x vector to expit
 #'
 #' Expit helper function.
 
