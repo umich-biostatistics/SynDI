@@ -9,6 +9,7 @@
 #' 
 #' @param data synthetic data
 #' @param indices indices ??
+#' @param q length of (X,B) in the full model, including the intercept
 #' 
 #' @return numeric vector of regression coefficients
 #' 
@@ -17,7 +18,7 @@
 #' imputations <arXiv:http://arxiv.org/abs/2106.06835>. 
 #' 
 #' @export
-Resample.gamma.binaryY <- function(data, indices){
+Resample.gamma.binaryY <- function(data, indices, q){
   d = data[indices,]
   datan = d
   
@@ -130,6 +131,7 @@ Resample.gamma.binaryY <- function(data, indices){
 #' 
 #' @param data synthetic data
 #' @param indices indices ??
+#' @param q length of (X,B) in the full model, including the intercept
 #' 
 #' @return numeric vector of regression coefficients
 #' 
@@ -139,7 +141,7 @@ Resample.gamma.binaryY <- function(data, indices){
 #' 
 #' @export
 
-Resample.gamma.continuousY <- function(data, indices){
+Resample.gamma.continuousY <- function(data, indices, q){
   d = data[indices,]
   data.n = d
   

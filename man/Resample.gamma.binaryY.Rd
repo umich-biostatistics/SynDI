@@ -4,12 +4,14 @@
 \alias{Resample.gamma.binaryY}
 \title{Resample for bootstrap variance for binary Y}
 \usage{
-Resample.gamma.binaryY(data, indices)
+Resample.gamma.binaryY(data, indices, q)
 }
 \arguments{
 \item{data}{synthetic data}
 
 \item{indices}{indices ??}
+
+\item{q}{length of (X,B) in the full model, including the intercept}
 }
 \value{
 numeric vector of regression coefficients

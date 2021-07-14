@@ -4,12 +4,14 @@
 \alias{Resample.gamma.continuousY}
 \title{Resample for bootstrap variance continuous Y}
 \usage{
-Resample.gamma.continuousY(data, indices)
+Resample.gamma.continuousY(data, indices, q)
 }
 \arguments{
 \item{data}{synthetic data}
 
 \item{indices}{indices ??}
+
+\item{q}{length of (X,B) in the full model, including the intercept}
 }
 \value{
 numeric vector of regression coefficients
