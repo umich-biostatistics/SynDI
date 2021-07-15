@@ -1,11 +1,11 @@
 ---
 title: "SynDI Example 1: Binary Response"
-author: "Name Surname"
+author: "Tian Gu"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEngine{knitr::knitr}
-  %\VignetteIndexEntry{Title of your vignette}
+  %\VignetteIndexEntry{SynDI Example 1: Binary Response}
   %\usepackage[UTF-8]{inputenc}
 ---
 
@@ -149,11 +149,7 @@ data.2 = cbind("Int" = 1, data.2)
 data.combined = rbind(data.combined, data.2)
 ```
 
-
-
 ### Step 2: Multiple imputation
-
-
 
 ```{r}
 ### Impute missingness ignoring the outcome Y
@@ -170,22 +166,14 @@ imputes = mice::mice(data.combined,
                      printFlag=F)
 ```
 
-
-
 ### Step 3: Stack M imputed datasets
-
-
 
 ```{r}
 stack = mice::complete(imputes, action="long", include = FALSE)
 stack$B2 = as.numeric(as.character(stack$B2))
 ```
 
-
-
 ### Step 4: Calculate population-specific weights
-
-
 
 ```{r}
 ##### Internal data only
@@ -237,11 +225,7 @@ if(sum(is.na(stack$wt))>0){
 }
 ```
 
-
-
 ### Step 5: Estimation
-
-
 
 ```{r}
 #### point estimation
@@ -258,7 +242,4 @@ results.boot = boot(data=datan,
                     statistic=Resample.gamma.binaryY,
                     R=2) ##R=2 is for illustration purpose to save running time. Typically a larger R number, e.g.R=500 is used for reliable estimates.***it may take hours to finish running 
 broom::tidy(results.boot)$std.error^2
-
 ```
-
-

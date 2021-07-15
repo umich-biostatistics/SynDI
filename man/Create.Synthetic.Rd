@@ -7,10 +7,10 @@
 Create.Synthetic(
   datan,
   nrep,
-  Y = "Y",
-  XB = c("X1", "X2", "X3", "X4", "B1", "B2"),
+  Y,
+  XB,
   Ytype = "binary",
-  parametric = c("Yes", "No"),
+  parametric,
   betaHatExt_list,
   sigmaHatExt_list = NULL
 )
@@ -35,8 +35,24 @@ Create.Synthetic(
 \description{
 Creates a synthetic data set from internal data and external models.
 }
+\examples{
+
+datan = data.frame(matrix(ncol = 8, nrow = n))
+names(datan) = c('Y', 'X1', 'X2', 'X3', 'X4', 'B1', 'B2','S')
+datan[,c('X1', 'X2', 'X3')] = MASS::mvrnorm(n, rep(0,3), diag(0.7,3)+0.3)
+datan$X4 = rnorm(n, mean = 0.2*(datan$X1+datan$X2+datan$X3), sd=1)
+datan$B1 = rnorm(n, mean = 0.2*(datan$X1+datan$X2+datan$X3)+0.1*datan$X4, sd=1)
+datan[,c('X1', 'X2', 'X3', 'X4', 'B1')] = apply(datan[,c('X1', 'X2', 'X3', 'X4', 'B1')], 2, function(x) x-mean(x))
+datan$B2 = rbinom(n, 1, prob = expit(0.2*(datan$X1+datan$X2+datan$X3)+0.1*(datan$X4+datan$B1)))
+datan$Y = rbinom(n, 1, prob = expit(data.matrix(cbind(1, datan[,c('X1', 'X2', 'X3', 'X4', 'B1','B2')])) \%*\% matrix(gamma.S0.true, q, 1)))
+
+data.combined = Create.Synthetic(nrep=nrep, datan=datan, Y='Y', 
+    XB = c('X1','X2','X3','X4','B1','B2'), Ytype='binary', parametric = c('Yes','No'),
+    betaHatExt_list=betaHatExt_list, sigmaHatExt_list=NULL)
+
+}
 \references{
 Reference: Gu, T., Taylor, J.M.G. and Mukherjee, B. (2021) Regression
 inference for multiple populations by integrating summary-level data using stacked
-imputations \url{arXiv:http://arxiv.org/abs/2106.06835}.
+imputations \href{http://arxiv.org/abs/2106.06835}{arxiv.org/abs/2106.06835}.
 }

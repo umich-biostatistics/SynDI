@@ -1,0 +1,209 @@
+---
+title: "SynDI Example 2: Continuous Response"
+author: "Tian Gu"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteIndexEntry{SynDI Example 2: Continuous Response}
+  %\usepackage[UTF-8]{inputenc}
+---
+
+```{=html}
+<style>
+  .content h3 {
+    margin-top: -30px !important;
+  }
+  
+  details {
+    margin-bottom: 40px;
+  }
+</style>
+```
+
+```{r, include = FALSE}
+library(mvtnorm)
+library(mice)
+library(arm)
+library(dplyr)
+library(StackImpute)
+library(randomForest)
+library(boot)
+library(broom)
+knitr::opts_chunk$set(
+  fig.dpi = 300, 
+  collapse = TRUE, 
+  comment = "#>",
+  fig.asp = 0.618,
+  fig.width = 6,
+  out.width = "80%"
+  )
+```
+
+## Example 2: Continuous Y, additional simulation 1 in the Supporting Material
+
+### Install/load `SynDI`
+
+```{r}
+#if(!("SynDI" %in% rownames(installed.packages()))) install.packages("SynDI")
+library(SynDI)
+```
+
+### Settings
+
+```{r}
+k = 2  #total number of external models
+n = 100  #internal study size
+nrep = 3 #when generating the synthetic data, replicate the observed X nrep times 
+m1 = 10000  #size of external study 1
+m2 = 10000  #size of external study 2
+p1 = 1 #length of X for external calculator 1, excluding the intercept
+p2 = 2 #length of X for external calculator 2, excluding the intercept
+q = 5 #length of (X,B) in the full model, including the intercept
+M = 100 #number of multiple imputation, denoted as M in the manuscript
+
+gamma.S0.true = c(-1, rep(-1,4))   #true target model parameter for the internal population
+gamma.S1.true = c(1, rep(-1,4))    #true target model parameter for external population 1
+gamma.S2.true = c(3, rep(-1,4))    #true target model parameter for external population 2
+```
+
+### Create external models
+
+```{r}
+###obtain beta estimates from external model 1: Y~X1
+###obtain beta estimates from external model 2: Y~X1+X2
+
+set.seed(2333)
+
+#Population 1 has (Y,X1)
+data.m1 = data.frame(matrix(ncol = 5, nrow = m1))
+names(data.m1) = c('Y', 'X1', 'X2','B1','B2')
+data.m1[,c('X1', 'X2','B1')] = MASS::mvrnorm(m1, rep(0,3), diag(0.7,3)+0.3)
+data.m1[,c('X1', 'X2', 'B1')] = apply(data.m1[,c('X1', 'X2', 'B1')], 2, function(x) x-mean(x))
+data.m1$B2 = rbinom(m1, 1, arm::invlogit(0.1*data.m1$X1 + 0.2*data.m1$X2 + 0.3*data.m1$B1))
+data.m1$Y = rnorm(m1, mean = data.matrix(cbind(1, data.m1[,c('X1','X2','B1','B2')])) %*% matrix(gamma.S1.true, q, 1), sd = 1)
+
+#Population 2 has (Y,X1,X2)
+data.m2 = data.frame(matrix(ncol = 5, nrow = m2))
+names(data.m2) = c('Y', 'X1', 'X2','B1','B2')
+data.m2[,c('X1', 'X2','B1')] = MASS::mvrnorm(m2, rep(0,3), diag(0.7,3)+0.3)
+data.m2[,c('X1', 'X2', 'B1')] = apply(data.m2[,c('X1', 'X2', 'B1')], 2, function(x) x-mean(x))
+data.m2$B2 = rbinom(m2, 1, arm::invlogit(0.1*data.m2$X1 + 0.2*data.m2$X2 + 0.3*data.m2$B1))
+data.m2$Y = rnorm(m2, mean = data.matrix(cbind(1, data.m2[,c('X1','X2','B1','B2')])) %*% matrix(gamma.S2.true, q, 1), sd = 1)
+
+fit.E1 = glm(Y ~ X1, data = data.m1, family=gaussian())
+fit.E2 = glm(Y ~ X1 + X2, data = data.m2, family=gaussian())
+
+#Calculator 1
+beta.E1 = coef(fit.E1)
+names(beta.E1) = c('int', 'X1')
+sigma.E1 = sigma(fit.E1)
+
+#Calculator 2
+beta.E2 = coef(fit.E2)
+names(beta.E2) = c('int', 'X1', 'X2')
+sigma.E2 = sigma(fit.E2)
+
+betaHatExt_list = list(Ext1 = beta.E1, Ext2 = beta.E2)
+sigmaHatExt_list = list(Ext1 = sigma.E1, Ext2 = sigma.E2)
+```
+
+### Create internal data set
+
+```{r}
+datan = data.frame(matrix(ncol = 6, nrow = n))
+names(datan) = c('Y', 'X1', 'X2', 'B1', 'B2','S')
+datan[,c('X1', 'X2', 'B1')] = MASS::mvrnorm(n, rep(0,3), diag(0.7,3)+0.3)
+datan[,c('X1', 'X2', 'B1')] = apply(datan[,c('X1', 'X2', 'B1')], 2, function(x) x-mean(x))
+datan$B2 = rbinom(n, 1, prob = expit(0.1*datan$X1 + 0.2*datan$X2 + 0.3*datan$B1))
+datan$Y = rnorm(n, mean = data.matrix(cbind(1, datan[,c('X1', 'X2', 'B1','B2')])) %*% matrix(gamma.S0.true, q, 1), sd = 1)
+```
+
+### Step 1: convert the external model information into the synthetic data
+
+```{r}
+#### Function Create.Synthetic() can create synthetic data for both parametric model 1 and model 2
+data.combined = Create.Synthetic(datan=datan, 
+                                 nrep=nrep, 
+                                 Y='Y', 
+                                 XB = c('X1','X2','B1','B2'), 
+                                 Ytype='continuous',
+                                 parametric = c('Yes','Yes'),
+                                 betaHatExt_list=betaHatExt_list, 
+                                 sigmaHatExt_list=sigmaHatExt_list)
+```
+
+### Step 2: Multiple imputation
+
+```{r}
+### Impute missingness ignoring the outcome Y
+pred_matrix = mice::make.predictorMatrix(data.combined)
+pred_matrix[c('Int',"Y",'X1','S'),] = 0
+pred_matrix[,c('Int','Y','S')] = 0
+imp_method = mice::make.method(data.combined)
+imp_method[c('X2','B1','B2')] = c('norm','norm','logreg') #choose your desired imputation method for each missingness
+data.combined$B2 = factor(data.combined$B2)
+imputes = mice::mice(data.combined,
+                     m=M,
+                     predictorMatrix=pred_matrix,
+                     method=imp_method,
+                     printFlag=F)
+```
+
+### Step 3: Stack M imputed datasets
+
+```{r}
+stack = mice::complete(imputes, action="long", include = FALSE)
+stack$B2 = as.numeric(as.character(stack$B2))
+```
+
+### Step 4: Calculate population-specific weights
+
+```{r}
+##### Internal data only
+fit.gamma.I = glm(Y ~ X1 + X2 + B1 + B2, data = datan, family=gaussian())
+gamma.I = coef(fit.gamma.I)
+
+######## calculate the initial gamma for population S=1 and S=2
+gamma.S1.origin = Initial.estimates(datan=datan, 
+                                    gamma.I=gamma.I, 
+                                    beta=betaHatExt_list[['Ext1']], 
+                                    X='X1', 
+                                    B=c('X2','B1','B2'), 
+                                    Btype=c('continuous','continuous','binary'))
+gamma.S2.origin = Initial.estimates(datan=datan, 
+                                    gamma.I=gamma.I, 
+                                    beta=betaHatExt_list[['Ext2']], 
+                                    X=c('X1','X2'), 
+                                    B=c('B1','B2'), 
+                                    Btype=c('continuous','binary'))
+
+############ calculate weights for each observation by population
+stack$wt = 0
+stack[stack$S == 0, 'wt'] = dnorm(stack[stack$S == 0, 'Y'], data.matrix(stack[stack$S==0, c('Int','X1','X2','B1','B2')])%*%matrix(gamma.I, q, 1))
+stack[stack$S == 1, 'wt'] = dnorm(stack[stack$S == 1, 'Y'], data.matrix(stack[stack$S==1, c('Int','X1','X2','B1','B2')])%*%matrix(gamma.S1.origin, q, 1))
+stack[stack$S == 2, 'wt'] = dnorm(stack[stack$S == 2, 'Y'], data.matrix(stack[stack$S==2, c('Int','X1','X2','B1','B2')])%*%matrix(gamma.S2.origin, q, 1))
+stack = as.data.frame(stack %>% group_by(.id) %>% mutate(wt = wt / sum(wt)))   ## weights need to be re-scaled to 1 within individuals
+if(sum(is.na(stack$wt))>0){
+  stack[is.na(stack$wt)==TRUE,]$wt = 0
+}
+```
+
+### Step 5: Estimation
+
+```{r}
+#### point estimation
+fit = glm(Y~X1+X2+B1+B2+factor(S), data=stack, family=gaussian(), weights = stack$wt)
+coef(fit)
+
+##### Lauren's variance estimation
+Louiscovar = StackImpute::Louis_Information(fit, stack, M = M)
+diag(solve(Louiscovar))
+
+##### Bootstrap variance 
+#***readers need to modify the existing function Resample.gamma.binaryY() to match their own Steps 1-5
+results.boot = boot(data=datan, 
+                    statistic=Resample.gamma.continuousY,
+                    R=2) ##R=2 is for illustration purpose to save running time. Typically a larger R number, e.g.R=500 is used for reliable estimates***it may take hours to finish running 
+broom::tidy(results.boot)$std.error^2
+```

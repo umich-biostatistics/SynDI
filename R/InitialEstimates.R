@@ -32,10 +32,10 @@
 #' 
 #' Gu, T., Taylor, J.M.G. and Mukherjee, B. (2021) Regression 
 #' inference for multiple populations by integrating summary-level data using stacked 
-#' imputations <arXiv:http://arxiv.org/abs/2106.06835>. 
+#' imputations [arxiv.org/abs/2106.06835](http://arxiv.org/abs/2106.06835).
 #' 
 #' @export
-Initial.estimates <- function(datan, gamma.I, X=c('X1','X2','X3'), B=c('X4','B1','B2'), beta=betaHatExt_list[['Ext1']], Btype=c('continuous','continuous','binary')){
+Initial.estimates <- function(datan, gamma.I, X, B, beta, Btype){
   E.B = Var.B = NULL
   E.B.X = delta.B.binary = list()
   for(i in 1:length(B)){

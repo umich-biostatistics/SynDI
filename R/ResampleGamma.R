@@ -5,22 +5,25 @@
 
 #' Resample for bootstrap variance for binary Y
 #' 
-#' Resampling function to get bootstrap variance for binary Y.
+#' Resampling function to get bootstrap variance for binary Y. Note that 
+#' readers need to modify the existing function Resample.gamma.binaryY() to 
+#' match their own Steps 1-5. It was only included in the package for the 
+#' purpose of providing an example.
 #' 
 #' @param data synthetic data
-#' @param indices indices ??
-#' @param q length of (X,B) in the full model, including the intercept
+#' @param indices row indices to replicate
 #' 
 #' @return numeric vector of regression coefficients
 #' 
 #' @references Reference: Gu, T., Taylor, J.M.G. and Mukherjee, B. (2021) Regression 
 #' inference for multiple populations by integrating summary-level data using stacked 
-#' imputations <arXiv:http://arxiv.org/abs/2106.06835>. 
+#' imputations [arxiv.org/abs/2106.06835](http://arxiv.org/abs/2106.06835).
 #' 
 #' @export
-Resample.gamma.binaryY <- function(data, indices, q){
+Resample.gamma.binaryY <- function(data, indices){
   d = data[indices,]
   datan = d
+  q = 7 #length of (X,B) in the full model, including the intercept
   
   ################ Step 1: convert the external model information into the synthetic data
   data.combined = Create.Synthetic(nrep=nrep, 
@@ -127,23 +130,26 @@ Resample.gamma.binaryY <- function(data, indices, q){
 
 #' Resample for bootstrap variance continuous Y
 #' 
-#' Resampling function to get bootstrap variance for continuous Y.
+#' Resampling function to get bootstrap variance for continuous Y. Note that 
+#' readers need to modify the existing function Resample.gamma.continuousY() to 
+#' match their own Steps 1-5. It was only included in the package for the 
+#' purpose of providing an example.
 #' 
 #' @param data synthetic data
-#' @param indices indices ??
-#' @param q length of (X,B) in the full model, including the intercept
+#' @param indices row indices to replicate
 #' 
 #' @return numeric vector of regression coefficients
 #' 
 #' @references Reference: Gu, T., Taylor, J.M.G. and Mukherjee, B. (2021) Regression 
 #' inference for multiple populations by integrating summary-level data using stacked 
-#' imputations <arXiv:http://arxiv.org/abs/2106.06835>. 
+#' imputations [arxiv.org/abs/2106.06835](http://arxiv.org/abs/2106.06835).
 #' 
 #' @export
 
-Resample.gamma.continuousY <- function(data, indices, q){
+Resample.gamma.continuousY <- function(data, indices){
   d = data[indices,]
   data.n = d
+  q = 5 #length of (X,B) in the full model, including the intercept
   
   ################ Step 1: convert the external model information into the synthetic data
   #### Function Create.Synthetic() can create synthetic data for both parametric model 1 and model 2

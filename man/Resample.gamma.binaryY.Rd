@@ -4,23 +4,24 @@
 \alias{Resample.gamma.binaryY}
 \title{Resample for bootstrap variance for binary Y}
 \usage{
-Resample.gamma.binaryY(data, indices, q)
+Resample.gamma.binaryY(data, indices)
 }
 \arguments{
 \item{data}{synthetic data}
 
-\item{indices}{indices ??}
-
-\item{q}{length of (X,B) in the full model, including the intercept}
+\item{indices}{row indices to replicate}
 }
 \value{
 numeric vector of regression coefficients
 }
 \description{
-Resampling function to get bootstrap variance for binary Y.
+Resampling function to get bootstrap variance for binary Y. Note that
+readers need to modify the existing function Resample.gamma.binaryY() to
+match their own Steps 1-5. It was only included in the package for the
+purpose of providing an example.
 }
 \references{
 Reference: Gu, T., Taylor, J.M.G. and Mukherjee, B. (2021) Regression
 inference for multiple populations by integrating summary-level data using stacked
-imputations \url{arXiv:http://arxiv.org/abs/2106.06835}.
+imputations \href{http://arxiv.org/abs/2106.06835}{arxiv.org/abs/2106.06835}.
 }

@@ -4,14 +4,7 @@
 \alias{Initial.estimates}
 \title{Internal estimation}
 \usage{
-Initial.estimates(
-  datan,
-  gamma.I,
-  X = c("X1", "X2", "X3"),
-  B = c("X4", "B1", "B2"),
-  beta = betaHatExt_list[["Ext1"]],
-  Btype = c("continuous", "continuous", "binary")
-)
+Initial.estimates(datan, gamma.I, X, B, beta, Btype)
 }
 \arguments{
 \item{datan}{internal data only}
@@ -40,5 +33,5 @@ omitted covariates in generalized linear models. Biometrika 80,807–815.
 
 Gu, T., Taylor, J.M.G. and Mukherjee, B. (2021) Regression
 inference for multiple populations by integrating summary-level data using stacked
-imputations \url{arXiv:http://arxiv.org/abs/2106.06835}.
+imputations \href{http://arxiv.org/abs/2106.06835}{arxiv.org/abs/2106.06835}.
 }
