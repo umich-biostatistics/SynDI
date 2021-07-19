@@ -35,153 +35,16 @@
 #' imputations [arxiv.org/abs/2106.06835](http://arxiv.org/abs/2106.06835).
 #' 
 #' @examples 
-#' \donttest{
-#' library(mvtnorm)
-#' library(mice)
-#' library(arm)
-#' library(dplyr)
-#' library(StackImpute)
-#' library(randomForest)
-#' library(boot)
-#' library(broom)
+#' #' data(initial_estimates_example)
 #' 
-#' k = 2  #total number of external models
-#' n = 1000  #internal study size
-#' nrep = 3 #when generating the synthetic data, replicate the observed X 
-#' #nrep times 
-#' m1 = 10000  #size of external study 1
-#' m2 = 10000  #size of external study 2
-#' p1 = 3 #length of X for external calculator 1, excluding the intercept
-#' p2 = 4 #length of X for external calculator 2, excluding the intercept
-#' q = 7 #length of (X,B) in the full model, including the intercept
-#' M = 100 #number of multiple imputation, denoted as M in the manuscript
+#' datan = initial_estimates_example$datan
+#' gamma.I = initial_estimates_example$gamma.I
+#' beta = initial_estimates_example$beta
 #' 
-#' gamma.S0.true = c(-1, rep(-1,6))   #true target model parameter for the internal 
-#' #population
-#' gamma.S1.true = c(2, rep(-1,6))    #true target model parameter for external 
-#' #population 1
-#' gamma.S2.true = c(3, rep(-1,6),-0.1,-0.1) ##true target model parameter for 
-#' #external population 2, including non-linear terms -0.1*X1^2-0.1*X2*X3
-#' set.seed(2333)
-#' 
-#' #########Population 1 has (Y,X1)
-#' data.m1 = data.frame(matrix(ncol = 7, nrow = m1))
-#' names(data.m1) = c('Y', 'X1', 'X2','X3', 'X4', 'B1','B2')
-#' data.m1[,c('X1', 'X2', 'X3')] = MASS::mvrnorm(m1, rep(0,3), diag(0.7,3)+0.3)
-#' data.m1$X4 = rnorm(m1, mean = 0.2*(data.m1$X1+data.m1$X2+data.m1$X3), sd=1)
-#' data.m1$B1 = rnorm(m1, mean = 0.2*(data.m1$X1+data.m1$X2+data.m1$X3)+0.1*
-#'                      data.m1$X4, sd=1)
-#' data.m1[,c('X1', 'X2', 'X3', 'X4', 'B1')] = apply(data.m1[,c('X1', 'X2', 'X3', 
-#'                                      'X4', 'B1')], 2, function(x) x-mean(x))
-#' data.m1$B2 = rbinom(m1, 1, expit(0.2*(data.m1$X1+data.m1$X2+data.m1$X3)+0.1*
-#'                                    (data.m1$X4+data.m1$B1)))
-#' data.m1$Y = rbinom(m1, 1, prob = expit(data.matrix(cbind(1, 
-#'                    data.m1[,c('X1', 'X2', 'X3', 'X4', 'B1','B2')])) %*% 
-#'                                          matrix(gamma.S1.true, q, 1)))
-#' #sum(data.m1$Y)/m1   ###prevalence=0.6454
-#' 
-#' fit.E1 = glm(Y~X1+X2+X3, data = data.m1, family = binomial(link='logit'))
-#' 
-#' ####### Beta estimates of external model 1
-#' beta.E1 = coef(fit.E1)
-#' names(beta.E1) = c('int', 'X1','X2','X3')
-#' betaHatExt_list = list(Ext1 = beta.E1)
-#' 
-#' #######Population 2 has (Y,X1,X2,X3,X4,X5)
-#' data.m2 = data.frame(matrix(ncol = 7, nrow = m2))
-#' names(data.m2) = c('Y', 'X1', 'X2','X3', 'X4', 'B1','B2')
-#' data.m2[,c('X1', 'X2', 'X3')] = MASS::mvrnorm(m2, rep(0,3), diag(0.7,3)+0.3)
-#' data.m2$X4 = rnorm(m2, mean = 0.2*(data.m2$X1+data.m2$X2+data.m2$X3), sd=1)
-#' data.m2$B1 = rnorm(m2, mean = 0.2*(data.m2$X1+data.m2$X2+data.m2$X3)+0.1*
-#'                      data.m2$X4, sd=1)
-#' data.m2[,c('X1', 'X2', 'X3', 'X4', 'B1')] = apply(data.m2[,c('X1', 'X2', 
-#'                            'X3', 'X4', 'B1')], 2, function(x) x-mean(x))
-#' data.m2$B2 = rbinom(m2, 1, expit(0.2*(data.m2$X1+data.m2$X2+data.m2$X3)+
-#'                                    0.1*(data.m2$X4+data.m2$B1)))
-#' data.m2$X1.sqr = data.m2$X1*data.m2$X1
-#' data.m2$X2.X3 = data.m2$X2*data.m2$X3
-#' data.m2$Y = rbinom(m2, 1, prob = expit(data.matrix(cbind(1, data.m2[,c('X1', 
-#'                        'X2', 'X3', 'X4', 'B1','B2','X1.sqr','X2.X3')])) %*% 
-#'                                          matrix(gamma.S2.true, q+2, 1)))
-#' 
-#' #######Risk calculator 2
-#' fit.rf = randomForest(Y~X1+X2+X3+X4, data=data.m2)
-#' 
-#' datan = data.frame(matrix(ncol = 8, nrow = n))
-#' names(datan) = c('Y', 'X1', 'X2', 'X3', 'X4', 'B1', 'B2','S')
-#' datan[,c('X1', 'X2', 'X3')] = MASS::mvrnorm(n, rep(0,3), diag(0.7,3)+0.3)
-#' datan$X4 = rnorm(n, mean = 0.2*(datan$X1+datan$X2+datan$X3), sd=1)
-#' datan$B1 = rnorm(n, mean = 0.2*(datan$X1+datan$X2+datan$X3)+0.1*datan$X4, sd=1)
-#' datan[,c('X1', 'X2', 'X3', 'X4', 'B1')] = apply(datan[,c('X1', 'X2', 'X3', 
-#'                                    'X4', 'B1')], 2, function(x) x-mean(x))
-#' datan$B2 = rbinom(n, 1, prob = expit(0.2*(datan$X1+datan$X2+datan$X3)+
-#'                                        0.1*(datan$X4+datan$B1)))
-#' datan$Y = rbinom(n, 1, prob = expit(data.matrix(cbind(1, datan[,c('X1', 'X2', 
-#'                   'X3', 'X4', 'B1','B2')])) %*% matrix(gamma.S0.true, q, 1)))
-#' 
-#' #### Function Create.Synthetic() can only create synthetic data for parametric 
-#' # model 1
-#' data.combined = Create.Synthetic(nrep=nrep, 
-#'                                  datan=datan, 
-#'                                  Y='Y', 
-#'                                  XB = c('X1','X2','X3','X4','B1','B2'), 
-#'                                  Ytype='binary',
-#'                                  parametric = c('Yes','No'),
-#'                                  betaHatExt_list=betaHatExt_list, 
-#'                                  sigmaHatExt_list=NULL)
-#'                                  
-#' #### For the external risk calculator 2 (k=2), we need to manually create the 
-#' # synthetic data, and then row-bind with the dataset data.combined
-#' X.2 = c('X1','X2','X3','X4') #predictors used in the external risk calculator 2
-#' B.2 = c('B1','B2')  #unobserved variables in the external risk calculator 2
-#' n = dim(datan)[1]   #total size of the internal data
-#' m = n*nrep          #total number of synthetic data for S=2
-#' data.2 = data.frame(matrix(ncol = 8, nrow = m))
-#' colnames(data.2) = c('Y', 'X1', 'X2', 'X3', 'X4', 'B1', 'B2', 'S')
-#' data.2[,B.2] = NA  #unobserved variables remain missing 
-#' #replicate the observed X.2 nrep times
-#' data.2[,X.2] = do.call("rbind", replicate(nrep, datan[,X.2], simplify = FALSE)) 
-#' #generate synthetic Y values via the external risk calculator 2 
-#' #(random forest model)
-#' data.2$Y = rbinom(m, 1, predict(fit.rf, newdata=data.2[,X.2])) 
-#' data.2$Y[is.na(data.2$Y)] = 1
-#' data.2$S = 2
-#' data.2 = cbind("Int" = 1, data.2)
-#' 
-#' ##### combine all synthetic data
-#' data.combined = rbind(data.combined, data.2)
-#' 
-#' ### Impute missingness ignoring the outcome Y
-#' pred_matrix = mice::make.predictorMatrix(data.combined)
-#' pred_matrix[c('Int',"Y",'X1','X2','X3','S'),] = 0
-#' pred_matrix[,c('Int','Y','S')] = 0
-#' imp_method = mice::make.method(data.combined)
-#' imp_method[c('X4','B1','B2')] = c('norm','norm','logreg') #choose your desired 
-#' # imputation method for each missingness
-#' data.combined$B2 = factor(data.combined$B2)
-#' imputes = mice::mice(data.combined,
-#'                      m=M,
-#'                      predictorMatrix=pred_matrix,
-#'                      method=imp_method,
-#'                      printFlag=F)
-#' 
-#' stack = mice::complete(imputes, action="long", include = FALSE)
-#' stack$B2 = as.numeric(as.character(stack$B2))
-#' 
-#' ##### Internal data only
-#' fit.gamma.I = glm(Y ~ X1 + X2 + X3 + X4 + B1 + B2, data = datan, 
-#'                   family=binomial(link='logit'))
-#' gamma.I = coef(fit.gamma.I)
-#' 
-#' ######## calculate the initial gamma for population S=1
-#' gamma.S1.origin= Initial.estimates(datan=datan, 
-#'                                    gamma.I=gamma.I, 
-#'                                    X=c('X1','X2','X3'), 
-#'                                    B=c('X4','B1','B2'), 
-#'                                    beta=betaHatExt_list[['Ext1']], 
-#'                                    Btype=c('continuous','continuous','binary'))
-#' 
-#' }
+#' # calculate the initial gamma for population S=1
+#' gamma.S1.origin = Initial.estimates(datan = datan, gamma.I = gamma.I, 
+#'     X = c('X1', 'X2', 'X3'), B = c('X4', 'B1', 'B2'), 
+#'     beta = beta, Btype = c('continuous', 'continuous', 'binary'))
 #' 
 #' @export
 Initial.estimates <- function(datan, gamma.I, X, B, beta, Btype){

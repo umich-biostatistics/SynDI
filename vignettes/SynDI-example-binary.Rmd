@@ -10,14 +10,6 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-library(mvtnorm)
-library(mice)
-library(arm)
-library(dplyr)
-library(StackImpute)
-library(randomForest)
-library(boot)
-library(broom)
 knitr::opts_chunk$set(
   fig.dpi = 300, 
   collapse = TRUE, 
@@ -35,6 +27,19 @@ knitr::opts_chunk$set(
 ```{r}
 #if(!("SynDI" %in% rownames(installed.packages()))) install.packages("SynDI")
 library(SynDI)
+```
+
+Install and load these other packages to complete the tutorial:
+
+```{r}
+library(mvtnorm)
+library(mice)
+library(arm)
+library(dplyr)
+library(StackImpute)
+library(randomForest)
+library(boot)
+library(broom)
 ```
 
 ### Settings

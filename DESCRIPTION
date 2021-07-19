@@ -30,7 +30,14 @@ Imports:
     mice,
     knitr,
     magrittr,
-    dplyr
+    dplyr,
+    StackImpute,
+    arm,
+    boot,
+    broom,
+    mvtnorm,
+    randomForest,
+    MASS
 Suggests: 
     markdown
 VignetteBuilder: knitr
