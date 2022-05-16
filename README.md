@@ -12,8 +12,8 @@
 
 Regression inference for multiple populations by integrating
 summary-level data using stacked imputations. Gu, T., Taylor, J.M.G. and
-Mukherjee, B. (2021) Regression inference for multiple populations by
-integrating summary-level data using stacked imputations
+Mukherjee, B. (2021) A synthetic data integration framework to leverage
+external summary-level information from heterogeneous populations
 \<arXiv:2106.06835>.
 
 ## Installation
@@ -46,6 +46,6 @@ vignette("SynDI-example-continuous")
 
 ### Current Suggested Citation
 
-Gu, T., Taylor, J.M.G. and Mukherjee, B. (2021) Regression inference for
-multiple populations by integrating summary-level data using stacked
-imputations arXiv:2106.06835.
+Gu, T., Taylor, J.M.G. and Mukherjee, B. (2021) A synthetic data
+integration framework to leverage external summary-level information
+from heterogeneous populations \<arXiv:2106.06835>.

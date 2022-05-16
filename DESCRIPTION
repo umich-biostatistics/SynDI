@@ -18,9 +18,10 @@ Authors@R:
              role = "cre",
              email = "mkleinsa@umich.edu"))
 Description: Regression inference for multiple populations by integrating 
-    summary-level data using stacked imputations. Gu, T., Taylor, J.M.G. and 
-    Mukherjee, B. (2021) Regression inference for multiple populations by 
-    integrating summary-level data using stacked imputations <arXiv:2106.06835>. 
+    summary-level data using stacked imputations. Gu, T., Taylor, J.M.G. 
+    and Mukherjee, B. (2021) A synthetic data integration framework to leverage 
+    external summary-level information from heterogeneous populations 
+    <arXiv:2106.06835>.
 License: GPL-2
 URL: https://github.com/umich-biostatistics/SynDI
 BugReports: https://github.com/umich-biostatistics/SynDI/issues
