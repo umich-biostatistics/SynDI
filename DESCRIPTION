@@ -18,8 +18,8 @@ Authors@R:
              role = "cre",
              email = "mkleinsa@umich.edu"))
 Description: Regression inference for multiple populations by integrating 
-    summary-level data using stacked imputations. Gu, T., Taylor, J.M.G. 
-    and Mukherjee, B. (2021) A synthetic data integration framework to leverage 
+    summary-level data using stacked imputations. Gu, T., Taylor, J.M.G. and 
+    Mukherjee, B. (2021) A synthetic data integration framework to leverage 
     external summary-level information from heterogeneous populations 
     <arXiv:2106.06835>.
 License: GPL-2
@@ -29,7 +29,6 @@ Depends:
     R (>= 3.6.0)
 Imports: 
     mice,
-    knitr,
     magrittr,
     dplyr,
     StackImpute,
@@ -38,11 +37,12 @@ Imports:
     broom,
     mvtnorm,
     randomForest,
-    MASS
+    MASS,
+    knitr
 Suggests: 
     markdown
 VignetteBuilder: knitr
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.0

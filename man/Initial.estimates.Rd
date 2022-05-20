@@ -46,5 +46,5 @@ omitted covariates in generalized linear models. Biometrika 80,807–815.
 
 Gu, T., Taylor, J.M.G. and Mukherjee, B. (2021) Regression
 inference for multiple populations by integrating summary-level data using stacked
-imputations \href{http://arxiv.org/abs/2106.06835}{arxiv.org/abs/2106.06835}.
+imputations \url{https://arxiv.org/abs/2106.06835}.
 }

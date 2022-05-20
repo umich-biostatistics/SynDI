@@ -23,5 +23,5 @@ purpose of providing an example.
 \references{
 Reference: Gu, T., Taylor, J.M.G. and Mukherjee, B. (2021) Regression
 inference for multiple populations by integrating summary-level data using stacked
-imputations \href{http://arxiv.org/abs/2106.06835}{arxiv.org/abs/2106.06835}.
+imputations \url{https://arxiv.org/abs/2106.06835}.
 }

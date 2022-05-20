@@ -17,7 +17,7 @@
 #' 
 #' @references Reference: Gu, T., Taylor, J.M.G. and Mukherjee, B. (2021) Regression 
 #' inference for multiple populations by integrating summary-level data using stacked 
-#' imputations [arxiv.org/abs/2106.06835](http://arxiv.org/abs/2106.06835).
+#' imputations [https://arxiv.org/abs/2106.06835](https://arxiv.org/abs/2106.06835).
 #' 
 #' @export
 Resample.gamma.binaryY <- function(data, indices){
@@ -142,7 +142,7 @@ Resample.gamma.binaryY <- function(data, indices){
 #' 
 #' @references Reference: Gu, T., Taylor, J.M.G. and Mukherjee, B. (2021) Regression 
 #' inference for multiple populations by integrating summary-level data using stacked 
-#' imputations [arxiv.org/abs/2106.06835](http://arxiv.org/abs/2106.06835).
+#' imputations [https://arxiv.org/abs/2106.06835](https://arxiv.org/abs/2106.06835).
 #' 
 #' @export
 
