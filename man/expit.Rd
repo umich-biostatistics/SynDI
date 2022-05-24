@@ -7,9 +7,13 @@
 expit(x)
 }
 \arguments{
-\item{x}{vector to expit
+\item{x}{vector to expit}
+}
+\value{
+numeric vector with the value of the expit function
+y = expit(x) = exp(x)/(1+exp(x)).
 
-Expit helper function.}
+Expit helper function.
 }
 \description{
 Expit function

@@ -26,6 +26,10 @@
 #' linear regression will be used; if "binary", logistic regression will be used. 
 #' More types can be implemented manually.
 #' 
+#' @return a numeric vector of estimated coefficients of the target model for the given 
+#' external population. Assume the internal data contains p predictors. The vector is of 
+#' dimension (p+1), including the estimates of the intercept.
+#' 
 #' @references 
 #' Neuhaus, J. and Jewell, N. (1993). A geometric approach to assess bias due to 
 #' omitted covariates in generalized linear models. Biometrika 80,807–815.

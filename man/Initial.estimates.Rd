@@ -24,6 +24,11 @@ the same as listed in X, e.g. names(beta) = c("int", "X1", "X2", "X3")}
 linear regression will be used; if "binary", logistic regression will be used.
 More types can be implemented manually.}
 }
+\value{
+a numeric vector of estimated coefficients of the target model for the given
+external population. Assume the internal data contains p predictors. The vector is of
+dimension (p+1), including the estimates of the intercept.
+}
 \description{
 Calculate the initial estimates for external populations.
 }

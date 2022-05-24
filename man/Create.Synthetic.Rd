@@ -32,6 +32,16 @@ Create.Synthetic(
 
 \item{sigmaHatExt_list}{a list of sigma^2 for continuous outcome fitted from linear regression. If not available or the outcome type is binary, set sigmaHatExt_list=NULL}
 }
+\value{
+a \code{data.frame}. The combined dataset of the internal data (of size n) and the synthetic
+data for the given external model (of size  n \code{*} nrep). This combined dataset
+contains a total of n*(1+nrep) rows, one intercept column (Int), one outcome
+column (Y), one indicator column (S), and all the predictors in the internal
+data. S is the indicator variable, where the internal data is indicated as S=0,
+and the synthetic data is indicated as S=1. The internal data part is a complete
+dataset without any missingness. The synthetic data part may contain missingness
+for certain predictors that were not used in the external model.
+}
 \description{
 Creates a synthetic data set from internal data and external models.
 }

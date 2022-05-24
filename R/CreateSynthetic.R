@@ -25,6 +25,15 @@
 #' @param betaHatExt_list a list of parameter estimates of the external models. The order needs to be the same as listed in XB, and variable name is required. See example for details.
 #' @param sigmaHatExt_list a list of sigma^2 for continuous outcome fitted from linear regression. If not available or the outcome type is binary, set sigmaHatExt_list=NULL
 #'
+#' @return a `data.frame`. The combined dataset of the internal data (of size n) and the synthetic 
+#' data for the given external model (of size  n `*` nrep). This combined dataset 
+#' contains a total of n*(1+nrep) rows, one intercept column (Int), one outcome 
+#' column (Y), one indicator column (S), and all the predictors in the internal 
+#' data. S is the indicator variable, where the internal data is indicated as S=0, 
+#' and the synthetic data is indicated as S=1. The internal data part is a complete 
+#' dataset without any missingness. The synthetic data part may contain missingness 
+#' for certain predictors that were not used in the external model.
+#' 
 #' @references Reference: Gu, T., Taylor, J.M.G. and Mukherjee, B. (2021) Regression 
 #' inference for multiple populations by integrating summary-level data using stacked 
 #' imputations [https://arxiv.org/abs/2106.06835](https://arxiv.org/abs/2106.06835). 
